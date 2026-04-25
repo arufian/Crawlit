@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+output/
+docker-compose.override.yml
+*.log
+.DS_Store

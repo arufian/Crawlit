@@ -1,5 +1,10 @@
 # Crawlit
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-22-green.svg)
+![Docker](https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+
 Self-hosted web crawler and scraper. Drop-in replacement for Firecrawl — same API shape, runs on your machine for free.
 
 ## Why

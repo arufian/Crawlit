@@ -1,5 +1,9 @@
 # Crawlit
 
+<p align="center">
+  <img src="logo.svg" width="120" alt="Crawlit logo"/>
+</p>
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-22-green.svg)
 ![Docker](https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white)

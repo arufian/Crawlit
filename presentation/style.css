@@ -1,0 +1,17 @@
+/* Hide the slides list panel */
+.slidev-nav {
+  display: none !important;
+}
+
+.nav-slide-list,
+.slidev-overview,
+[class*="slide-list"],
+[class*="SlideList"],
+[class*="overview"] {
+  display: none !important;
+}
+
+
+#slidev-goto-dialog {
+  display: none !important;
+}

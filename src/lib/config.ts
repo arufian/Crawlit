@@ -3,9 +3,6 @@ import { z } from 'zod'
 const schema = z.object({
   PORT: z.coerce.number().default(3000),
   HOST: z.string().default('0.0.0.0'),
-  API_KEYS: z.string().default('').transform((v) =>
-    v ? v.split(',').map((k) => k.trim()).filter(Boolean) : []
-  ),
   REDIS_URL: z.string().default('redis://localhost:6379'),
   CACHE_TTL_SECONDS: z.coerce.number().default(86400),
   BROWSER_POOL_SIZE: z.coerce.number().default(3),

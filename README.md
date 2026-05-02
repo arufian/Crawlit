@@ -20,6 +20,7 @@ Firecrawl is great but costs money at any meaningful volume. Crawlit gives you t
 - **`/v1/scrape`** — Single page → clean markdown, HTML, links
 - **`/v1/crawl`** — Async multi-page crawl with BFS, depth control, domain filtering
 - **`/v1/map`** — Fast URL discovery via sitemap.xml + link extraction
+- **`/v1/search`** — Web search via DuckDuckGo (returns title, URL, snippet)
 - **Stealth browser** — Playwright + puppeteer-extra-plugin-stealth for JS-heavy sites
 - **Proxy support** — Per-request residential proxy for bot-protected sites
 - **LLM extraction** — Schema-guided JSON extraction via OpenAI or Anthropic
@@ -194,6 +195,23 @@ Tries `sitemap.xml` first, falls back to link extraction from the seed page.
 
 ---
 
+### Search the web
+
+```bash
+curl -X POST http://localhost:3000/v1/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "crawlit firecrawl alternative",
+    "limit": 5
+  }'
+
+# Returns: { "success": true, "data": { "query": "...", "results": [...], "total": 3 } }
+```
+
+Searches via DuckDuckGo's HTML endpoint. Returns title, URL, and snippet for each result. Supports `limit` (1–50, default 10). May be rate-limited with heavy use.
+
+---
+
 ### Saved files
 
 When `save: true`, files land in `./output/` on your host machine (Docker volume mount):
@@ -233,8 +251,12 @@ cp .env.example .env
 ```
 
 | Variable | Description |
-|---|---|
+|---|---|---|
 | `PROXY_URL` | Residential proxy for bot-protected sites, e.g. `http://user:pass@host:port` |
+| `OPENAI_API_KEY` | OpenAI API key (for LLM extraction) |
+| `ANTHROPIC_API_KEY` | Anthropic API key (for LLM extraction) |
+| `LLM_PROVIDER` | `openai` (default) or `anthropic` |
+| `LLM_MODEL` | Model name, default `gpt-4o-mini` |
 
 ---
 
@@ -284,6 +306,9 @@ crawlit_browser_pool_active
 npm install
 npm run dev        # start with hot reload (no Docker, needs local Redis)
 npm run typecheck  # TypeScript check
+npm test           # run all tests (API integration + load)
+npm run test:api   # API integration tests only
+npm run test:load  # Load test only (1000 concurrent)
 npm run build      # compile to dist/
 ```
 
@@ -305,6 +330,8 @@ POST /v1/crawl  ──► BullMQ queue (Redis)
                      └─ Worker: fetch → extract → pushResult → enqueue children
 
 POST /v1/map    ──► sitemap.xml parser → link extractor
+
+POST /v1/search  ──► DuckDuckGo HTML → cheerio parser → JSON results
 ```
 
 - **Fastify** — API server

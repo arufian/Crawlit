@@ -32,6 +32,7 @@ let browser: Browser | null = null
 const pool: PooledContext[] = []
 
 const LAUNCH_ARGS = [
+  // Required for Docker — Chrome sandbox needs SYS_ADMIN capability
   '--no-sandbox',
   '--disable-setuid-sandbox',
   '--disable-dev-shm-usage',
@@ -40,7 +41,6 @@ const LAUNCH_ARGS = [
   '--no-zygote',
   // Stealth extras
   '--disable-blink-features=AutomationControlled',
-  '--disable-features=IsolateOrigins,site-per-process',
 ]
 
 async function getBrowser(): Promise<Browser> {

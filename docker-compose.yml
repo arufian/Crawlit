@@ -6,7 +6,6 @@ services:
     environment:
       - REDIS_URL=redis://redis:6379
       - LOG_LEVEL=info
-      - API_KEYS=${API_KEYS:-}
       - CACHE_TTL_SECONDS=${CACHE_TTL_SECONDS:-86400}
       - OUTPUT_DIR=/app/output
       - PROXY_URL=${PROXY_URL:-}

@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { createRequire } from 'module'
 import { fetchHttp } from '../../core/fetcher/http-fetcher.js'
 import { extractLinks } from '../../core/extractor/metadata-extractor.js'
-import { authMiddleware } from '../middleware/auth.js'
 import normalizeUrl from 'normalize-url'
 
 const _require = createRequire(import.meta.url)
@@ -63,7 +62,6 @@ async function discoverViaSitemap(baseUrl: string, timeoutMs: number): Promise<s
 export async function mapRoute(app: FastifyInstance): Promise<void> {
   app.post<{ Body: MapBodyType }>(
     '/v1/map',
-    { preHandler: authMiddleware },
     async (req, reply) => {
       const parsed = MapBody.safeParse(req.body)
       if (!parsed.success) {

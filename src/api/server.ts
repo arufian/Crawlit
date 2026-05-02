@@ -8,6 +8,7 @@ import { healthRoute } from './routes/health.js'
 import { scrapeRoute } from './routes/scrape.js'
 import { crawlRoute } from './routes/crawl.js'
 import { mapRoute } from './routes/map.js'
+import { searchRoute } from './routes/search.js'
 import { metricsRoute } from './routes/metrics.js'
 import { closePool } from '../core/fetcher/browser-pool.js'
 import { startCrawlWorker } from '../jobs/crawl-worker.js'
@@ -40,6 +41,7 @@ export async function buildServer() {
   await app.register(scrapeRoute)
   await app.register(crawlRoute)
   await app.register(mapRoute)
+  await app.register(searchRoute)
   await app.register(metricsRoute)
 
   return app

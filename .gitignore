@@ -5,3 +5,4 @@ output/
 docker-compose.override.yml
 *.log
 .DS_Store
+tests/output/

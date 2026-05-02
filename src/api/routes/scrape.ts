@@ -8,9 +8,9 @@ import { extractMetadata, extractLinks } from '../../core/extractor/metadata-ext
 import { htmlToMarkdown, contentToMarkdown } from '../../core/transformer/html-to-markdown.js'
 import { extractWithLLM } from '../../core/extractor/llm-extractor.js'
 import { cacheKey, cacheGet, cacheSet } from '../../lib/cache.js'
-import { authMiddleware } from '../middleware/auth.js'
 import { saveMarkdownFile } from '../../core/transformer/save-markdown.js'
 import { scrapeTotal, scrapeDuration, cacheHits } from '../../lib/metrics.js'
+import { logger } from '../../lib/logger.js'
 
 const BrowserActionSchema = z.object({
   type: z.enum(['click', 'scroll', 'wait', 'type']),
@@ -45,7 +45,6 @@ type ScrapeBodyType = z.infer<typeof ScrapeBody>
 export async function scrapeRoute(app: FastifyInstance): Promise<void> {
   app.post<{ Body: ScrapeBodyType }>(
     '/v1/scrape',
-    { preHandler: authMiddleware },
     async (req, reply) => {
       const parsed = ScrapeBody.safeParse(req.body)
       if (!parsed.success) {
@@ -82,7 +81,8 @@ export async function scrapeRoute(app: FastifyInstance): Promise<void> {
         scrapeTotal.inc({ mode: opts.mode, status: 'error' })
         timer()
         const msg = err instanceof Error ? err.message : String(err)
-        return reply.status(500).send({ success: false, error: `Fetch failed: ${msg}` })
+        logger.error({ err: msg, url: opts.url }, 'Scrape fetch failed')
+        return reply.status(500).send({ success: false, error: 'Fetch failed' })
       }
 
       const { html, statusCode, url: finalUrl } = fetchResult

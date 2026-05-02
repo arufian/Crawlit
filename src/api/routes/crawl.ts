@@ -5,8 +5,6 @@ import { crawlQueue } from '../../jobs/queue.js'
 import {
   createCrawl, getMeta, getResults, updateMeta, markSeen, deleteCrawl,
 } from '../../jobs/crawl-state.js'
-import { authMiddleware } from '../middleware/auth.js'
-
 const CrawlBody = z.object({
   url: z.string().url(),
   maxDepth: z.number().int().min(1).max(10).default(3),
@@ -25,7 +23,6 @@ export async function crawlRoute(app: FastifyInstance): Promise<void> {
   // POST /v1/crawl — start crawl
   app.post<{ Body: CrawlBodyType }>(
     '/v1/crawl',
-    { preHandler: authMiddleware },
     async (req, reply) => {
       const parsed = CrawlBody.safeParse(req.body)
       if (!parsed.success) {
@@ -64,7 +61,6 @@ export async function crawlRoute(app: FastifyInstance): Promise<void> {
   // GET /v1/crawl/:id — status + results
   app.get<{ Params: { id: string }; Querystring: { offset?: string; limit?: string } }>(
     '/v1/crawl/:id',
-    { preHandler: authMiddleware },
     async (req, reply) => {
       const meta = await getMeta(req.params.id)
       if (!meta) {
@@ -90,7 +86,6 @@ export async function crawlRoute(app: FastifyInstance): Promise<void> {
   // DELETE /v1/crawl/:id — cancel
   app.delete<{ Params: { id: string } }>(
     '/v1/crawl/:id',
-    { preHandler: authMiddleware },
     async (req, reply) => {
       const meta = await getMeta(req.params.id)
       if (!meta) {

@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#161b27"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </radialGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#607080" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#607080" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="armorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6a7585"/>
+      <stop offset="50%" stop-color="#3d4a58"/>
+      <stop offset="100%" stop-color="#252e3a"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7a8898"/>
+      <stop offset="100%" stop-color="#3a4555"/>
+    </linearGradient>
+    <filter id="eyeGlow" x="-80%" y="-80%" width="360%" height="360%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="bodyGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="coreGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="200" height="200" rx="36" fill="url(#bgGrad)"/>
+
+  <!-- Web spokes -->
+  <g stroke="#1b2a3a" stroke-width="1.2">
+    <line x1="100" y1="100" x2="100" y2="8"/>
+    <line x1="100" y1="100" x2="184" y2="52"/>
+    <line x1="100" y1="100" x2="184" y2="148"/>
+    <line x1="100" y1="100" x2="100" y2="192"/>
+    <line x1="100" y1="100" x2="16" y2="148"/>
+    <line x1="100" y1="100" x2="16" y2="52"/>
+  </g>
+
+  <!-- Web rings (hexagonal) -->
+  <polygon points="100,72 124,86 124,114 100,128 76,114 76,86"
+           fill="none" stroke="#1b2a3a" stroke-width="1.2"/>
+  <polygon points="100,44 148,72 148,128 100,156 52,128 52,72"
+           fill="none" stroke="#1b2a3a" stroke-width="1.2" opacity="0.6"/>
+  <polygon points="100,16 172,58 172,142 100,184 28,142 28,58"
+           fill="none" stroke="#1b2a3a" stroke-width="1.2" opacity="0.35"/>
+
+  <!-- Glow aura -->
+  <circle cx="100" cy="100" r="46" fill="url(#glowGrad)"/>
+
+  <!-- === ROBO SPIDER — ROBOCOP GRAY === -->
+
+  <!-- Abdomen — octagonal armored shell -->
+  <polygon points="100,90 117,95 123,110 117,126 100,131 83,126 77,110 83,95"
+           fill="url(#armorGrad)" stroke="#8a9aaa" stroke-width="1.8" filter="url(#bodyGlow)"/>
+
+  <!-- Abdomen armor panel seams -->
+  <line x1="85" y1="100" x2="115" y2="100" stroke="#aab8c4" stroke-width="0.8" opacity="0.4"/>
+  <line x1="81" y1="110" x2="119" y2="110" stroke="#aab8c4" stroke-width="0.8" opacity="0.4"/>
+  <line x1="85" y1="120" x2="115" y2="120" stroke="#aab8c4" stroke-width="0.8" opacity="0.4"/>
+  <line x1="100" y1="92" x2="100" y2="129" stroke="#aab8c4" stroke-width="0.8" opacity="0.25"/>
+
+  <!-- Rivet bolts at panel corners -->
+  <circle cx="88" cy="100" r="1.5" fill="#9aaab8"/>
+  <circle cx="112" cy="100" r="1.5" fill="#9aaab8"/>
+  <circle cx="88" cy="120" r="1.5" fill="#9aaab8"/>
+  <circle cx="112" cy="120" r="1.5" fill="#9aaab8"/>
+
+  <!-- Power core — dim red (system online) -->
+  <circle cx="100" cy="110" r="5.5" fill="#cc2020" opacity="0.9" filter="url(#coreGlow)"/>
+  <circle cx="100" cy="110" r="2.5" fill="#ffaaaa"/>
+
+  <!-- Head/thorax — angular trapezoid -->
+  <polygon points="86,72 114,72 119,90 81,90"
+           fill="url(#headGrad)" stroke="#8a9aaa" stroke-width="1.8" filter="url(#bodyGlow)"/>
+
+  <!-- Head panel seam + highlight brow -->
+  <line x1="85" y1="81" x2="115" y2="81" stroke="#c0ccd8" stroke-width="0.8" opacity="0.35"/>
+  <!-- Brow ridge highlight -->
+  <line x1="87" y1="73.5" x2="113" y2="73.5" stroke="#c0ccd8" stroke-width="1" opacity="0.5"/>
+
+  <!-- SHARP ROBO EYES — angular slits, red laser (Robocop) -->
+  <!-- Left eye -->
+  <polygon points="87,74 97,74 95.5,80 85.5,80" fill="#ff1a1a" filter="url(#eyeGlow)"/>
+  <polygon points="87,74 97,74 95.5,80 85.5,80" fill="#ff6060" opacity="0.4"/>
+  <line x1="86.5" y1="76.8" x2="96.5" y2="76.8" stroke="#ffcccc" stroke-width="0.6" opacity="0.8"/>
+
+  <!-- Right eye -->
+  <polygon points="103,74 113,74 114.5,80 104.5,80" fill="#ff1a1a" filter="url(#eyeGlow)"/>
+  <polygon points="103,74 113,74 114.5,80 104.5,80" fill="#ff6060" opacity="0.4"/>
+  <line x1="103.5" y1="76.8" x2="113.5" y2="76.8" stroke="#ffcccc" stroke-width="0.6" opacity="0.8"/>
+
+  <!-- Mandibles / fangs -->
+  <polyline points="90,72 84,64 80,60" stroke="#7a8898" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  <polyline points="110,72 116,64 120,60" stroke="#7a8898" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  <circle cx="80" cy="60" r="2.5" fill="#9aaab8"/>
+  <circle cx="120" cy="60" r="2.5" fill="#9aaab8"/>
+
+  <!-- Segmented legs — 2 segments + joint per leg, steel gray -->
+  <g stroke="#7a8898" stroke-width="2.2" stroke-linecap="round" fill="none">
+    <!-- Left 4 -->
+    <polyline points="81,94 65,81 46,74"/>
+    <circle cx="65" cy="81" r="3" fill="#9aaab8"/>
+
+    <polyline points="81,99 63,95 44,97"/>
+    <circle cx="63" cy="95" r="3" fill="#9aaab8"/>
+
+    <polyline points="81,106 64,112 48,122"/>
+    <circle cx="64" cy="112" r="3" fill="#9aaab8"/>
+
+    <polyline points="81,112 65,125 52,140"/>
+    <circle cx="65" cy="125" r="3" fill="#9aaab8"/>
+
+    <!-- Right 4 -->
+    <polyline points="119,94 135,81 154,74"/>
+    <circle cx="135" cy="81" r="3" fill="#9aaab8"/>
+
+    <polyline points="119,99 137,95 156,97"/>
+    <circle cx="137" cy="95" r="3" fill="#9aaab8"/>
+
+    <polyline points="119,106 136,112 152,122"/>
+    <circle cx="136" cy="112" r="3" fill="#9aaab8"/>
+
+    <polyline points="119,112 135,125 148,140"/>
+    <circle cx="135" cy="125" r="3" fill="#9aaab8"/>
+  </g>
+
+  <!-- Hanging thread (steel cable) -->
+  <line x1="100" y1="72" x2="100" y2="44" stroke="#7a8898" stroke-width="1.5" opacity="0.45" stroke-dasharray="3,3"/>
+</svg>

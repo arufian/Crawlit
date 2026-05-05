@@ -18,6 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- REFINED: Link to new stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -73,8 +74,10 @@
           <img src="logo.svg" width="120" height="120" alt="Crawlit robo-spider mascot" class="hero-logo">
         </div>
 
-        <p class="section-eyebrow reveal">// SELF-HOSTED WEB CRAWLER FOR AI WORKFLOWS</p>
+        <!-- REFINED: Eyebrow now uses display font, no slashes -->
+        <p class="section-eyebrow reveal">Self-Hosted Web Crawler</p>
 
+        <!-- REFINED: Hero title uses solid color instead of gradient -->
         <h1 id="hero-heading" class="hero-title reveal">
           Scrape the web.<br>Feed your LLM.
         </h1>
@@ -105,7 +108,8 @@
     <section id="features" class="section features" aria-labelledby="features-heading">
       <div class="container">
         <div class="section-header reveal">
-          <p class="section-eyebrow">// FEATURES</p>
+          <!-- REFINED: No slashes, display font eyebrow -->
+          <p class="section-eyebrow">Features</p>
           <h2 id="features-heading" class="section-title">Everything you need.<br>Nothing you don't.</h2>
         </div>
 
@@ -189,7 +193,8 @@
     <section id="quickstart" class="section quickstart" aria-labelledby="quickstart-heading">
       <div class="container">
         <div class="section-header reveal">
-          <p class="section-eyebrow">// QUICKSTART</p>
+          <!-- REFINED: No slashes -->
+          <p class="section-eyebrow">Quickstart</p>
           <h2 id="quickstart-heading" class="section-title">Up and running in 60 seconds.</h2>
         </div>
 
@@ -232,7 +237,8 @@ cd Crawlit</code></pre>
         </div>
 
         <div class="try-it reveal">
-          <p class="try-it-label">// TRY IT NOW</p>
+          <!-- REFINED: No slashes -->
+          <p class="try-it-label">Try It Now</p>
           <div class="code-block">
             <pre><code>curl -X POST http://localhost:3000/v1/scrape \
   -H "Content-Type: application/json" \
@@ -246,7 +252,8 @@ cd Crawlit</code></pre>
     <section id="api" class="section api-section" aria-labelledby="api-heading">
       <div class="container">
         <div class="section-header reveal">
-          <p class="section-eyebrow">// API REFERENCE</p>
+          <!-- REFINED: No slashes -->
+          <p class="section-eyebrow">API Reference</p>
           <h2 id="api-heading" class="section-title">Three endpoints. That's it.</h2>
           <p class="section-lead">All endpoints accept JSON and return JSON. Base URL: <code>http://localhost:3000</code></p>
         </div>
@@ -451,7 +458,8 @@ curl -X DELETE http://localhost:3000/v1/crawl/&lt;job-id&gt;</code></pre>
     <section id="architecture" class="section architecture" aria-labelledby="arch-heading">
       <div class="container">
         <div class="section-header reveal">
-          <p class="section-eyebrow">// UNDER THE HOOD</p>
+          <!-- REFINED: No slashes -->
+          <p class="section-eyebrow">Under the Hood</p>
           <h2 id="arch-heading" class="section-title">Built on boring, reliable parts.</h2>
         </div>
 
@@ -459,82 +467,123 @@ curl -X DELETE http://localhost:3000/v1/crawl/&lt;job-id&gt;</code></pre>
           <svg viewBox="0 0 920 360" xmlns="http://www.w3.org/2000/svg" class="arch-svg">
             <defs>
               <marker id="ah" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
-                <path d="M0,0 L0,7 L7,3.5 z" fill="#00d4ff"/>
+                <path d="M0,0 L0,7 L7,3.5 z" fill="#ffb347"/>
               </marker>
               <marker id="ah-muted" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
                 <path d="M0,0 L0,7 L7,3.5 z" fill="#2a3d52"/>
               </marker>
-              <marker id="ah-amber" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
-                <path d="M0,0 L0,7 L7,3.5 z" fill="#ffb347"/>
+              <marker id="ah-cyan" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                <path d="M0,0 L0,7 L7,3.5 z" fill="#00d4ff"/>
               </marker>
+
+              <!-- glow filter for core group -->
+              <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
             </defs>
 
+            <!-- ===== CORE ENGINE GROUP ===== -->
+            <rect x="8" y="42" width="904" height="306" rx="16" fill="none" stroke="rgba(255,179,71,.15)" stroke-width="1.5" stroke-dasharray="8,6"/>
+            <text x="460" y="62" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#46596e" letter-spacing=".12em">CORE ENGINE</text>
+
+            <!-- ===== MAIN DATA FLOW (static lines + moving arrows) ===== -->
+            <!-- Client → Fastify -->
+            <line x1="120" y1="170" x2="178" y2="170" stroke="#ffb347" stroke-width="1.5" opacity=".25"/>
+            <polygon points="0,-4 10,0 0,4" fill="#ffb347" opacity=".9">
+              <animateMotion path="M120,170 L178,170" dur="2s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+            <!-- Fastify → BullMQ -->
+            <line x1="315" y1="170" x2="378" y2="170" stroke="#ffb347" stroke-width="1.5" opacity=".25"/>
+            <polygon points="0,-4 10,0 0,4" fill="#ffb347" opacity=".9">
+              <animateMotion path="M315,170 L378,170" dur="2s" begin="0.5s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+            <!-- BullMQ → Workers -->
+            <line x1="515" y1="170" x2="578" y2="170" stroke="#ffb347" stroke-width="1.5" opacity=".25"/>
+            <polygon points="0,-4 10,0 0,4" fill="#ffb347" opacity=".9">
+              <animateMotion path="M515,170 L578,170" dur="2s" begin="1s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+            <!-- Workers → Output -->
+            <line x1="710" y1="170" x2="773" y2="170" stroke="#ffb347" stroke-width="1.5" opacity=".25"/>
+            <polygon points="0,-4 10,0 0,4" fill="#ffb347" opacity=".9">
+              <animateMotion path="M710,170 L773,170" dur="2s" begin="1.5s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+
+            <!-- ===== ASYNC CONNECTIONS (static dashed + moving arrows) ===== -->
+            <!-- Fastify → Redis -->
+            <line x1="247" y1="215" x2="247" y2="262" stroke="#2a3d52" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
+            <polygon points="0,-3.5 8,0 0,3.5" fill="#2a3d52" opacity=".7">
+              <animateMotion path="M247,215 L247,262" dur="1.5s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+            <!-- Workers → Playwright -->
+            <line x1="620" y1="215" x2="600" y2="262" stroke="#2a3d52" stroke-width="1.5" stroke-dasharray="5,3" opacity=".4"/>
+            <polygon points="0,-3.5 8,0 0,3.5" fill="#2a3d52" opacity=".7">
+              <animateMotion path="M620,215 L600,262" dur="1.5s" begin="0.7s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+            <!-- Workers → LLM -->
+            <line x1="670" y1="215" x2="760" y2="262" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="5,3" opacity=".35"/>
+            <polygon points="0,-3.5 8,0 0,3.5" fill="#00d4ff" opacity=".7">
+              <animateMotion path="M670,215 L760,262" dur="2s" repeatCount="indefinite" rotate="auto"/>
+            </polygon>
+
+            <!-- ===== ALL COMPONENTS — CORE STYLING ===== -->
             <!-- CLIENT -->
-            <rect x="20" y="140" width="100" height="60" rx="8" fill="#0d1520" stroke="#2a3d52" stroke-width="1.5"/>
+            <rect x="20" y="140" width="100" height="60" rx="8" fill="rgba(255,255,255,.03)" stroke="#3d5a70" stroke-width="2"/>
             <text x="70" y="166" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#8b96a3">Client</text>
             <text x="70" y="183" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#4a5d72">HTTP</text>
 
-            <!-- → Fastify -->
-            <line x1="120" y1="170" x2="178" y2="170" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ah)"/>
-
             <!-- FASTIFY -->
-            <rect x="180" y="125" width="135" height="90" rx="8" fill="#0c1828" stroke="#00d4ff" stroke-width="1.5"/>
+            <rect x="180" y="125" width="135" height="90" rx="8" fill="rgba(255,179,71,.08)" stroke="#ffb347" stroke-width="2"/>
             <text x="247" y="158" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e0eaf5" font-weight="500">Fastify</text>
             <text x="247" y="176" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#8b96a3">API Server</text>
             <text x="247" y="193" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">:3000</text>
 
-            <!-- → BullMQ -->
-            <line x1="315" y1="170" x2="378" y2="170" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ah)"/>
-
             <!-- BULLMQ -->
-            <rect x="380" y="125" width="135" height="90" rx="8" fill="#0d1520" stroke="#2a3d52" stroke-width="1.5"/>
+            <rect x="380" y="125" width="135" height="90" rx="8" fill="rgba(255,179,71,.05)" stroke="#ffb347" stroke-width="2"/>
             <text x="447" y="158" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e0eaf5" font-weight="500">BullMQ</text>
             <text x="447" y="176" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#8b96a3">Job Queue</text>
             <text x="447" y="193" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">Redis-backed</text>
 
-            <!-- → Workers -->
-            <line x1="515" y1="170" x2="578" y2="170" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ah)"/>
-
             <!-- WORKERS -->
-            <rect x="580" y="125" width="130" height="90" rx="8" fill="#0d1520" stroke="#2a3d52" stroke-width="1.5"/>
+            <rect x="580" y="125" width="130" height="90" rx="8" fill="rgba(255,179,71,.05)" stroke="#ffb347" stroke-width="2"/>
             <text x="645" y="158" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e0eaf5" font-weight="500">Workers</text>
             <text x="645" y="176" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="#8b96a3">Fetch + Extract</text>
             <text x="645" y="193" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">concurrent</text>
 
-            <!-- → Output -->
-            <line x1="710" y1="170" x2="773" y2="170" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ah)"/>
-
             <!-- OUTPUT -->
-            <rect x="775" y="140" width="120" height="60" rx="8" fill="#0d1520" stroke="#2a3d52" stroke-width="1.5"/>
+            <rect x="775" y="140" width="120" height="60" rx="8" fill="rgba(255,255,255,.03)" stroke="#3d5a70" stroke-width="2"/>
             <text x="835" y="165" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="11" fill="#e0eaf5">Markdown</text>
             <text x="835" y="183" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">+ YAML frontmatter</text>
 
-            <!-- REDIS (below Fastify) -->
-            <line x1="247" y1="215" x2="247" y2="262" stroke="#2a3d52" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah-muted)"/>
-            <rect x="180" y="265" width="135" height="60" rx="8" fill="#0d1520" stroke="#2a3d52" stroke-width="1.5"/>
+            <!-- REDIS -->
+            <rect x="180" y="265" width="135" height="60" rx="8" fill="rgba(255,179,71,.05)" stroke="#ffb347" stroke-width="2"/>
             <text x="247" y="291" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e0eaf5" font-weight="500">Redis</text>
             <text x="247" y="308" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#4a5d72">cache + queue store</text>
 
-            <!-- PLAYWRIGHT (below Workers) -->
-            <line x1="620" y1="215" x2="600" y2="262" stroke="#2a3d52" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah-muted)"/>
-            <rect x="555" y="265" width="135" height="60" rx="8" fill="#0d1520" stroke="#2a3d52" stroke-width="1.5"/>
+            <!-- PLAYWRIGHT -->
+            <rect x="555" y="265" width="135" height="60" rx="8" fill="rgba(255,179,71,.05)" stroke="#ffb347" stroke-width="2"/>
             <text x="622" y="291" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e0eaf5" font-weight="500">Playwright</text>
             <text x="622" y="308" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#4a5d72">stealth browser</text>
 
-            <!-- LLM (below Output) -->
-            <line x1="670" y1="215" x2="760" y2="262" stroke="#ffb347" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah-amber)"/>
-            <rect x="735" y="265" width="135" height="60" rx="8" fill="#0d1520" stroke="#ffb347" stroke-width="1.5"/>
+            <!-- LLM -->
+            <rect x="735" y="265" width="135" height="60" rx="8" fill="rgba(0,212,255,.08)" stroke="#00d4ff" stroke-width="2"/>
             <text x="802" y="291" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="12" fill="#e0eaf5" font-weight="500">LLM</text>
-            <text x="802" y="308" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#ffb347">OpenAI · Anthropic</text>
+            <text x="802" y="308" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="9" fill="#8b96a3">OpenAI · Anthropic</text>
 
-            <!-- Legend -->
+            <!-- ===== Legend ===== -->
             <g transform="translate(20, 18)">
-              <line x1="0" y1="6" x2="28" y2="6" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#ah)"/>
-              <text x="34" y="10" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">data flow</text>
-              <line x1="105" y1="6" x2="133" y2="6" stroke="#2a3d52" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah-muted)"/>
-              <text x="139" y="10" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">async</text>
-              <line x1="195" y1="6" x2="223" y2="6" stroke="#ffb347" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#ah-amber)"/>
-              <text x="229" y="10" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">optional (LLM)</text>
+              <!-- amber = core component -->
+              <rect x="0" y="0" width="10" height="10" rx="2" fill="rgba(255,179,71,.12)" stroke="#ffb347" stroke-width="1"/>
+              <text x="16" y="9" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">core component</text>
+              <!-- cyan = LLM extraction -->
+              <rect x="128" y="0" width="10" height="10" rx="2" fill="rgba(0,212,255,.12)" stroke="#00d4ff" stroke-width="1"/>
+              <text x="144" y="9" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">LLM extraction</text>
+              <!-- amber arrow = data flow -->
+              <line x1="245" y1="6" x2="273" y2="6" stroke="#ffb347" stroke-width="1.5" marker-end="url(#ah)"/>
+              <text x="279" y="10" font-family="'JetBrains Mono',monospace" font-size="8.5" fill="#4a5d72">data flow</text>
             </g>
           </svg>
         </div>
@@ -558,7 +607,8 @@ curl -X DELETE http://localhost:3000/v1/crawl/&lt;job-id&gt;</code></pre>
     <section id="config" class="section config-section" aria-labelledby="config-heading">
       <div class="container">
         <div class="section-header reveal">
-          <p class="section-eyebrow">// CONFIGURATION</p>
+          <!-- REFINED: No slashes -->
+          <p class="section-eyebrow">Configuration</p>
           <h2 id="config-heading" class="section-title">Configure via environment variables.</h2>
           <p class="section-lead">Copy <code>.env.example</code> to <code>.env</code>. All variables are optional — sensible defaults apply.</p>
         </div>
@@ -589,7 +639,9 @@ curl -X DELETE http://localhost:3000/v1/crawl/&lt;job-id&gt;</code></pre>
     <section id="cta" class="section cta-section" aria-labelledby="cta-heading">
       <div class="container cta-inner">
         <div class="cta-content reveal">
-          <p class="section-eyebrow">// OPEN SOURCE · MIT LICENSE</p>
+          <!-- REFINED: No slashes -->
+          <p class="section-eyebrow">Open Source · MIT License</p>
+          <!-- REFINED: CTA title uses solid color instead of gradient -->
           <h2 id="cta-heading" class="cta-title">Ready to crawl?</h2>
           <p class="cta-sub">Self-hosted. Free forever. Yours to extend.</p>
           <div class="cta-actions">

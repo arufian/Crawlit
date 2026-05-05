@@ -1,6 +1,6 @@
 /* ============================================================
-   CRAWLIT — styles.css
-   Industrial Mech Terminal aesthetic
+   CRAWLIT — new-styles.css
+   Industrial Mech Terminal aesthetic — REFINED
    ============================================================ */
 
 /* 0. FONTS loaded via <link> in HTML (Exo 2, DM Sans, JetBrains Mono) */
@@ -24,11 +24,13 @@ table { border-collapse: collapse; }
   --txt-2:        #7a8fa8;
   --txt-3:        #46596e;
 
+  /* REFINED: Reduced cyan dominance, added more amber */
   --cyan:         #00d4ff;
-  --cyan-dim:     rgba(0,212,255,.12);
-  --cyan-glow:    rgba(0,212,255,.35);
+  --cyan-dim:     rgba(0,212,255,.10);
+  --cyan-glow:    rgba(0,212,255,.25);
   --amber:        #ffb347;
-  --red:          #ff2828;
+  --amber-dim:    rgba(255,179,71,.12);
+  --red:          #ff4747;
 
   --mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
   --head: 'Exo 2', system-ui, sans-serif;
@@ -55,7 +57,7 @@ body {
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
-::selection { background: rgba(0,212,255,.18); color: var(--txt); }
+::selection { background: rgba(0,212,255,.15); color: var(--txt); }
 
 h1,h2,h3,h4 {
   font-family: var(--head);
@@ -69,8 +71,9 @@ h3 { font-size: 1.1rem; font-weight: 600; }
 
 p { color: var(--txt-2); line-height: 1.72; }
 
-a { color: var(--cyan); text-decoration: none; transition: color .18s; }
-a:hover { color: #55e0ff; }
+/* REFINED: Links now use amber as primary, cyan as hover */
+a { color: var(--amber); text-decoration: none; transition: color .18s; }
+a:hover { color: #ffd27f; }
 
 code {
   font-family: var(--mono);
@@ -79,16 +82,18 @@ code {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 2px 6px;
-  color: var(--cyan);
+  color: var(--amber);
 }
 pre code { background: none; border: none; padding: 0; font-size: .875rem; line-height: 1.72; color: var(--txt); }
 
 /* 4. SKIP LINK */
 .skip-link {
   position: absolute; left:-9999px; top:-9999px; z-index:9999;
-  padding: 8px 16px; background: var(--cyan); color: var(--bg);
-  font-family: var(--mono); font-size: .875rem; font-weight: 600;
+  padding: 8px 16px; background: var(--amber); color: var(--bg);
+  font-family: var(--head); font-size: .875rem; font-weight: 700;
   border-radius: var(--r-sm); text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 .skip-link:focus { left:16px; top:16px; }
 
@@ -97,23 +102,24 @@ pre code { background: none; border: none; padding: 0; font-size: .875rem; line-
 .section   { padding: 7rem 1.5rem; }
 
 .section-header  { margin-bottom: 4rem; max-width: 680px; }
+
+/* REFINED: Eyebrows now use display font (Exo 2) instead of monospace */
 .section-eyebrow {
-  font-family: var(--mono);
-  font-size: .72rem; font-weight: 500;
-  letter-spacing: .16em; text-transform: uppercase;
-  color: var(--cyan); margin-bottom: 1.1rem; line-height: 1;
+  font-family: var(--head);
+  font-size: .75rem; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--amber); margin-bottom: 1.1rem; line-height: 1;
 }
 .section-title   { margin-bottom: 0; }
 .section-lead    { margin-top: 1.25rem; font-size: 1.05rem; }
 
-/* 6. HEADER */
+/* 6. HEADER — REFINED: Removed glassmorphism, solid terminal look */
 .site-header {
   position: sticky; top: 0; z-index: 100;
   height: var(--hh);
-  background: rgba(7,11,16,.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: var(--bg); /* Solid instead of blurred */
   border-bottom: 1px solid var(--border);
+  /* Removed: backdrop-filter: blur(18px); */
 }
 .header-inner {
   height: 100%; display: flex; align-items: center;
@@ -137,10 +143,11 @@ pre code { background: none; border: none; padding: 0; font-size: .875rem; line-
   display: inline-flex; align-items: center; gap: 4px;
   white-space: nowrap; position: relative;
 }
-.nav-link:hover, .nav-link.is-active { color: var(--cyan); background: var(--cyan-dim); }
+/* REFINED: Nav links use amber for active/hover instead of cyan */
+.nav-link:hover, .nav-link.is-active { color: var(--amber); background: var(--amber-dim); }
 .nav-link::after {
   content: ''; position: absolute; bottom: 0; left: 11px; right: 11px;
-  height: 1px; background: var(--cyan);
+  height: 1px; background: var(--amber);
   transform: scaleX(0); transition: transform .2s var(--ease);
 }
 .nav-link.is-active::after { transform: scaleX(1); }
@@ -148,7 +155,7 @@ pre code { background: none; border: none; padding: 0; font-size: .875rem; line-
   margin-left: .5rem;
   border: 1px solid var(--border-hi); color: var(--txt);
 }
-.nav-github:hover { border-color: var(--cyan); }
+.nav-github:hover { border-color: var(--amber); }
 
 .nav-toggle {
   display: none; background: none;
@@ -156,7 +163,7 @@ pre code { background: none; border: none; padding: 0; font-size: .875rem; line-
   padding: 8px 10px; flex-direction: column; gap: 4px;
   color: var(--txt-2); transition: border-color .18s, color .18s;
 }
-.nav-toggle:hover { border-color: var(--cyan); color: var(--cyan); }
+.nav-toggle:hover { border-color: var(--amber); color: var(--amber); }
 .hamburger,
 .hamburger::before,
 .hamburger::after {
@@ -189,11 +196,12 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   pointer-events: none;
 }
 
+/* REFINED: Reduced cyan glow intensity */
 .hero-glow-orb {
   position: absolute; top: 40%; left: 50%;
   transform: translate(-50%,-50%);
   width: 700px; height: 500px;
-  background: radial-gradient(ellipse, rgba(0,212,255,.055) 0%, transparent 65%);
+  background: radial-gradient(ellipse, rgba(255,179,71,.04) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -215,8 +223,8 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   animation: logopulse 3.2s ease-in-out infinite;
 }
 @keyframes logopulse {
-  0%,100% { filter: drop-shadow(0 0 10px rgba(0,212,255,.28)); }
-  50%      { filter: drop-shadow(0 0 28px rgba(0,212,255,.65)) drop-shadow(0 0 6px rgba(255,40,40,.2)); }
+  0%,100% { filter: drop-shadow(0 0 8px rgba(255,179,71,.20)); }
+  50%      { filter: drop-shadow(0 0 20px rgba(255,179,71,.45)) drop-shadow(0 0 6px rgba(0,212,255,.15)); }
 }
 .hero-logo-ring {
   position: absolute; inset: -14px;
@@ -226,19 +234,19 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
 .hero-logo-ring::before {
   content: '';
   position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
-  width: 8px; height: 8px; background: var(--cyan); border-radius: 50%;
-  box-shadow: 0 0 10px var(--cyan-glow);
+  width: 8px; height: 8px; background: var(--amber); border-radius: 50%;
+  box-shadow: 0 0 10px var(--amber-dim);
 }
 @keyframes ringspin {
   to { transform: rotate(360deg); }
 }
 
+/* REFINED: Hero title - SOLID COLOR instead of gradient */
 .hero-title {
   font-size: clamp(2.8rem,6.5vw,5.2rem);
   font-weight: 800; letter-spacing: -.035em; line-height: 1.04;
-  background: linear-gradient(145deg, #ffffff 0%, #b0d4f0 55%, var(--cyan) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
+  /* REMOVED: gradient text */
+  color: var(--txt); /* Solid white/off-white */
   margin-bottom: 1.4rem;
 }
 .hero-sub {
@@ -259,7 +267,7 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   border: 1px solid var(--border-hi);
   border-radius: var(--r-md);
   padding: .9rem 3.5rem .9rem 1.4rem;
-  font-family: var(--mono); font-size: 1.05rem; color: var(--cyan);
+  font-family: var(--mono); font-size: 1.05rem; color: var(--amber);
 }
 .hero-cmd-hint {
   font-family: var(--mono); font-size: .72rem;
@@ -274,19 +282,21 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   text-decoration: none; transition: all .18s var(--ease);
   border: none; white-space: nowrap; line-height: 1;
 }
-.btn-primary  { background: var(--cyan); color: #030709; font-weight: 700; }
+/* REFINED: Primary button uses amber instead of cyan */
+.btn-primary  { background: var(--amber); color: #1a0f00; font-weight: 700; }
 .btn-primary:hover {
-  background: #40e0ff; color: #030709;
+  background: #ffd27f; color: #1a0f00;
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0,212,255,.28);
+  box-shadow: 0 8px 28px rgba(255,179,71,.28);
 }
 .btn-secondary {
   background: transparent; color: var(--txt);
   border: 1px solid var(--border-hi);
 }
+/* REFINED: Secondary button hover uses amber */
 .btn-secondary:hover {
-  border-color: var(--cyan); color: var(--cyan);
-  background: var(--cyan-dim); transform: translateY(-2px);
+  border-color: var(--amber); color: var(--amber);
+  background: var(--amber-dim); transform: translateY(-2px);
 }
 .btn-lg { padding: 13px 26px; font-size: .925rem; }
 
@@ -302,14 +312,9 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   color: var(--txt);
   padding-right: 5rem;
 }
-/* top-left corner accent */
-.code-block pre::before {
-  content: '';
-  position: absolute; top: -1px; left: -1px;
-  width: 14px; height: 14px;
-  border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
-  border-radius: var(--r-md) 0 0 0;
-  pointer-events: none;
+/* full border accent */
+.code-block pre {
+  border: 1.5px solid var(--amber);
 }
 .copy-btn {
   position: absolute; top: .7rem; right: .7rem;
@@ -318,7 +323,8 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   font-family: var(--mono); font-size: .68rem;
   color: var(--txt-3); transition: all .15s; white-space: nowrap;
 }
-.copy-btn:hover   { border-color: var(--cyan); color: var(--cyan); }
+/* REFINED: Copy button hover uses amber */
+.copy-btn:hover   { border-color: var(--amber); color: var(--amber); }
 .copy-btn.is-copied { border-color: #22c55e; color: #22c55e; }
 
 /* 10. FEATURES */
@@ -331,39 +337,27 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   gap: 1.4rem;
 }
 .feature-card {
-  background: var(--bg-up); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 1.875rem;
-  position: relative; overflow: hidden;
+  background: var(--bg-up);
+  border: 1.5px solid var(--amber);
+  border-radius: var(--r-lg);
+  padding: 1.875rem;
+  position: relative;
+  overflow: hidden;
   transition: border-color .2s, transform .25s var(--ease);
 }
-/* HUD bracket top-left */
-.feature-card::before {
-  content: '';
-  position: absolute; top: -1px; left: -1px;
-  width: 14px; height: 14px;
-  border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
-  border-radius: var(--r-lg) 0 0 0;
-  transition: width .2s, height .2s;
+.feature-card:hover {
+  border-color: var(--amber);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 32px rgba(255, 179, 71, 0.08);
 }
-/* HUD bracket bottom-right */
-.feature-card::after {
-  content: '';
-  position: absolute; bottom: -1px; right: -1px;
-  width: 14px; height: 14px;
-  border-bottom: 2px solid var(--border-hi); border-right: 2px solid var(--border-hi);
-  border-radius: 0 0 var(--r-lg) 0;
-  transition: width .2s, height .2s, border-color .2s;
-}
-.feature-card:hover { border-color: var(--border-hi); transform: translateY(-5px); }
-.feature-card:hover::before { width: 26px; height: 26px; }
-.feature-card:hover::after  { width: 26px; height: 26px; border-color: var(--cyan); }
 
+/* REFINED: Feature icons use amber instead of cyan */
 .feature-icon {
   width: 42px; height: 42px;
-  background: var(--cyan-dim); border: 1px solid var(--border-hi);
+  background: var(--amber-dim); border: 1px solid var(--border-hi);
   border-radius: var(--r-md);
   display: flex; align-items: center; justify-content: center;
-  color: var(--cyan); margin-bottom: 1.25rem; flex-shrink: 0;
+  color: var(--amber); margin-bottom: 1.25rem; flex-shrink: 0;
 }
 .feature-card h3 { font-size: 1.05rem; margin-bottom: .55rem; }
 .feature-card p  { font-size: .9rem; color: var(--txt-2); line-height: 1.65; }
@@ -374,21 +368,22 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   display: flex; flex-direction: column;
   position: relative; margin-bottom: 3rem;
 }
-/* connector line */
+/* connector line - REFINED: amber gradient instead of cyan */
 .steps::before {
   content: '';
   position: absolute; left: 27px; top: 55px; bottom: 55px;
   width: 1px;
-  background: linear-gradient(180deg, var(--cyan), var(--border) 60%, transparent);
+  background: linear-gradient(180deg, var(--amber), var(--border) 60%, transparent);
 }
 .step {
   display: grid; grid-template-columns: 56px 1fr;
   gap: 2rem; padding: 2.5rem 0; align-items: start;
 }
 .step + .step { border-top: 1px solid var(--border); }
+/* REFINED: Step numbers use amber */
 .step-num {
   font-family: var(--mono); font-size: 1.5rem; font-weight: 700;
-  color: var(--cyan); line-height: 1;
+  color: var(--amber); line-height: 1;
   width: 54px; height: 54px;
   display: flex; align-items: center; justify-content: center;
   background: var(--bg-up); border: 1px solid var(--border-hi);
@@ -400,18 +395,18 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
 .step-content p   { margin-bottom: 1.1rem; font-size: .95rem; }
 
 .try-it {
-  background: var(--bg-up); border: 1px solid var(--border-hi);
-  border-radius: var(--r-lg); padding: 2rem;
-  position: relative; overflow: hidden;
+  background: var(--bg-up);
+  border: none;
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
 }
-.try-it::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, var(--cyan), transparent 70%);
-}
+/* REFINED: Try-it label uses amber */
 .try-it-label {
-  font-family: var(--mono); font-size: .7rem; font-weight: 500;
-  letter-spacing: .16em; color: var(--cyan); margin-bottom: 1rem;
+  font-family: var(--head); font-size: .72rem; font-weight: 700;
+  letter-spacing: .16em; color: var(--amber); margin-bottom: 1rem;
+  text-transform: uppercase;
 }
 
 /* 12. API */
@@ -419,25 +414,22 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   background: linear-gradient(180deg, var(--bg-down) 0%, var(--bg) 100%);
 }
 .endpoint-card {
-  background: var(--bg-up); border: 1px solid var(--border);
-  border-radius: var(--r-lg); overflow: hidden;
-  margin-bottom: 1.75rem; position: relative;
-}
-/* left accent stripe */
-.endpoint-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; bottom: 0;
-  width: 3px; background: var(--amber);
+  background: var(--bg-up);
+  border: none;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 1.75rem;
 }
 .endpoint-header {
   padding: 1.4rem 1.75rem;
   display: flex; align-items: baseline; gap: 1.1rem; flex-wrap: wrap;
   border-bottom: 1px solid var(--border);
 }
+/* REFINED: Method badge slightly adjusted */
 .method-badge {
   font-family: var(--mono); font-size: .66rem; font-weight: 800;
   letter-spacing: .1em;
-  background: var(--amber); color: #1a0800;
+  background: var(--amber); color: #1a0f00;
   padding: 3px 9px; border-radius: 4px; flex-shrink: 0;
 }
 .endpoint-path {
@@ -464,7 +456,8 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   margin-bottom: -1px;
 }
 .tab-btn:hover    { color: var(--txt-2); }
-.tab-btn.is-active { color: var(--cyan); border-bottom-color: var(--cyan); }
+/* REFINED: Active tab uses amber */
+.tab-btn.is-active { color: var(--amber); border-bottom-color: var(--amber); }
 .tab-panel[hidden] { display: none; }
 
 /* param / config tables shared base */
@@ -476,7 +469,7 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
   width: 100%; font-size: .875rem;
 }
 .params-table th, .config-table th {
-  font-family: var(--mono); font-size: .68rem; font-weight: 600;
+  font-family: var(--head); font-size: .72rem; font-weight: 700;
   letter-spacing: .12em; text-transform: uppercase;
   color: var(--txt-3); padding: 10px 16px; text-align: left;
   background: var(--bg-down); border-bottom: 1px solid var(--border);
@@ -488,11 +481,13 @@ body.nav-open .hamburger::after     { transform: rotate(-45deg) translate(3.5px,
 }
 .params-table tbody tr:last-child td,
 .config-table tbody tr:last-child td { border-bottom: none; }
+/* REFINED: Hover uses amber tint instead of cyan */
 .params-table tbody tr:hover td,
-.config-table tbody tr:hover td { background: rgba(0,212,255,.03); }
+.config-table tbody tr:hover td { background: rgba(255,179,71,.04); }
 
+/* REFINED: Parameter names use amber */
 .params-table td:first-child code {
-  color: var(--cyan); background: none; border: none; padding: 0;
+  color: var(--amber); background: none; border: none; padding: 0;
   font-size: .82rem;
 }
 td.req {
@@ -503,6 +498,7 @@ td.req {
 /* 13. CONFIG */
 .config-section { background: var(--bg); }
 .config-table-wrap { border-radius: var(--r-lg); }
+/* REFINED: Config variable names use amber */
 .config-table td:first-child code {
   color: var(--amber); background: none; border: none; padding: 0;
   font-size: .82rem;
@@ -514,17 +510,13 @@ td.req {
 /* 14. ARCHITECTURE */
 .architecture { background: var(--bg-down); }
 .arch-diagram {
-  background: var(--bg-up); border: 1px solid var(--border);
-  border-radius: var(--r-lg); padding: 1.75rem;
-  margin-bottom: 2.75rem; overflow: hidden;
+  background: var(--bg-up);
+  border: 1.5px solid var(--amber);
+  border-radius: var(--r-lg);
+  padding: 1.75rem;
+  margin-bottom: 2.75rem;
+  overflow: hidden;
   position: relative;
-}
-.arch-diagram::before {
-  content: '';
-  position: absolute; top: -1px; left: -1px;
-  width: 18px; height: 18px;
-  border-top: 2px solid var(--cyan); border-left: 2px solid var(--cyan);
-  border-radius: var(--r-lg) 0 0 0;
 }
 .arch-svg { width: 100%; height: auto; }
 .stack-grid { display: flex; flex-wrap: wrap; gap: .7rem; }
@@ -535,7 +527,8 @@ td.req {
   background: var(--bg-up);
   transition: border-color .15s, color .15s;
 }
-.stack-chip:hover { border-color: var(--cyan); color: var(--cyan); }
+/* REFINED: Stack chip hover uses amber */
+.stack-chip:hover { border-color: var(--amber); color: var(--amber); }
 
 /* 15. CTA */
 .cta-section {
@@ -546,7 +539,8 @@ td.req {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%,-50%);
   width: 900px; height: 450px;
-  background: radial-gradient(ellipse, rgba(0,212,255,.05) 0%, transparent 65%);
+  /* REFINED: Reduced glow intensity, amber tint */
+  background: radial-gradient(ellipse, rgba(255,179,71,.04) 0%, transparent 65%);
   pointer-events: none;
 }
 /* hex grid in CTA bg */
@@ -558,11 +552,13 @@ td.req {
 }
 .cta-inner { position: relative; z-index: 1; }
 .cta-content { text-align: center; }
+
+/* REFINED: CTA title - solid color instead of gradient */
 .cta-title {
   font-size: clamp(2.4rem,4.5vw,3.8rem); font-weight: 800;
-  background: linear-gradient(135deg, #fff, var(--cyan));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text; margin-bottom: .9rem;
+  /* REMOVED: gradient text */
+  color: var(--txt);
+  margin-bottom: .9rem;
 }
 .cta-sub { font-size: 1.1rem; margin-bottom: 2.5rem; color: var(--txt-2); }
 .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
@@ -577,14 +573,16 @@ td.req {
   gap: 3rem; margin-bottom: 3rem; padding-bottom: 3rem;
   border-bottom: 1px solid var(--border);
 }
+/* REFINED: Footer titles use display font */
 .footer-col-title {
-  font-family: var(--mono); font-size: .68rem; font-weight: 600;
+  font-family: var(--head); font-size: .72rem; font-weight: 700;
   letter-spacing: .16em; text-transform: uppercase;
   color: var(--txt-3); margin-bottom: 1.2rem;
 }
 .footer-col nav { display: flex; flex-direction: column; gap: .6rem; }
 .footer-col nav a { font-size: .9rem; color: var(--txt-2); transition: color .15s; }
-.footer-col nav a:hover { color: var(--cyan); }
+/* REFINED: Footer links use amber on hover */
+.footer-col nav a:hover { color: var(--amber); }
 .footer-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
 .footer-chip {
   font-family: var(--mono); font-size: .68rem; color: var(--txt-3);
@@ -629,10 +627,10 @@ td.req {
   .nav-primary {
     display: none;
     position: fixed; top: var(--hh); left: 0; right: 0;
-    background: rgba(7,11,16,.97);
+    background: var(--bg); /* Solid instead of blurred */
     border-bottom: 1px solid var(--border);
     flex-direction: column; padding: 1rem; gap: .25rem;
-    backdrop-filter: blur(16px);
+    /* Removed: backdrop-filter: blur(16px); */
   }
   body.nav-open .nav-primary { display: flex; }
   .nav-link { padding: 10px 14px; width: 100%; }
@@ -671,9 +669,9 @@ td.req {
   html { scroll-behavior: auto; }
 }
 
-/* 20. FOCUS */
+/* 20. FOCUS — REFINED: amber focus instead of cyan */
 :focus-visible {
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--amber);
   outline-offset: 3px;
   border-radius: 3px;
 }

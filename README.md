@@ -13,47 +13,66 @@ Self-hosted web crawler and scraper. Drop-in replacement for Firecrawl — same 
 
 ## Why
 
-Firecrawl is great but costs money at any meaningful volume. Crawlit gives you the same core functionality (scrape, crawl, map, LLM extraction) running locally via Docker — for free.
+The AI web scraping landscape is crowded with tools like Firecrawl, Crawl4AI, Jina Reader, ScrapeGraphAI, Apify, and Bright Data. Most charge per page, require complex setup, or lock you into their ecosystem.
 
-**AI Agent Ready:** Use the [crawlit-skill](https://github.com/arufian/crawlit-skill) to let AI coding assistants (Claude Code, Codex, OpenCode, etc.) control Crawlit directly. Your AI agent becomes your web research assistant.
+**Crawlit is different:**
+
+- **Free forever** — MIT-licensed, open-source, no per-page costs, no API credits
+- **Self-hosted** — Runs on your machine via Docker. Your data stays yours.
+- **Firecrawl-compatible** — Same API shape (`/v1/scrape`, `/v1/crawl`, `/v1/map`), so migration is trivial
+- **AI Agent Ready** — Use [crawlit-skill](https://github.com/arufian/crawlit-skill) to let Claude Code, Codex, OpenCode, and other AI assistants control Crawlit directly
+- **Full control** — No rate limits, no usage caps, no vendor lock-in
+
+**When to choose Crawlit:**
+
+- You're scraping at volume and don't want to pay $16-$599/month (Firecrawl) or manage complex infrastructure (Apify, Bright Data)
+- You want a self-hosted alternative to Jina Reader or Crawl4AI with a cleaner API
+- You need AI agent integration without building custom tooling
+- You value simplicity: one `docker compose up` and you're live
+
+Crawlit gives you the same core functionality as the paid tools (scrape, crawl, map, LLM extraction, stealth browser) — running locally for free.
 
 ## Comparison
 
-All three tools self-host at $0. The difference is what you pay when you need scale without managing infrastructure.
+How Crawlit stacks up against other AI web scraping tools:
 
-| | Crawlit | [crawl4ai](https://github.com/unclecode/crawl4ai) | [Firecrawl](https://firecrawl.dev) |
-|---|---|---|---|
-| **License** | MIT | Apache 2.0 | AGPL-3.0 (OSS) / Proprietary (Cloud) |
-| **Self-hosted** | $0 | $0 | $0 (complex setup, AGPL restrictions) |
-| **Cloud (Free)** | — | Closed beta (TBD) | Free tier: 1,000 pages/mo |
-| **Cloud (Paid)** | — | Closed beta (claims cheaper) | Hobby: **$16/mo** (5K pages) · Standard: **$83/mo** (100K) · Growth: **$333/mo** (500K) · Scale: **$599/mo** (1M) · Enterprise: custom |
-| **Shape** | Docker Compose, API-first | Python library, CLI, Docker API server | Managed REST API |
-| **API compatibility** | Firecrawl-compatible (`/v1/scrape`, `/v1/crawl`, `/v1/map`) | Custom API | Reference API |
-| **Browser mode** | Playwright + stealth plugin | Playwright | Playwright |
-| **LLM extraction** | OpenAI + Anthropic (schema-guided) | OpenAI + Anthropic | OpenAI + Anthropic |
-| **Queue** | BullMQ (Redis) | Async Python | Managed |
-| **Cache** | Redis | Optional | Managed |
+| | Crawlit | [Crawl4AI](https://github.com/unclecode/crawl4ai) | [Jina Reader](https://jina.ai/reader/) | [Firecrawl](https://firecrawl.dev) | [Apify](https://apify.com) |
+|---|---|---|---|---|---|
+| **License** | MIT | Apache 2.0 | Proprietary (free tier) | AGPL-3.0 (OSS) / Proprietary (Cloud) | Proprietary |
+| **Self-hosted** | $0 | $0 | $0 (limited) | $0 (complex setup, AGPL) | $0 (limited) |
+| **Cloud (Free)** | — | — | 50K credits/mo | 1,000 pages/mo | $5 credits/mo |
+| **Cloud (Paid)** | — | — | Pay-per-use | **$16/mo** (5K) · **$83/mo** (100K) · **$333/mo** (500K) | **$39/mo** (Starter) · **$199/mo** (Scale) |
+| **Shape** | Docker Compose, API-first | Python library, CLI | URL prefix API (`r.jina.ai`) | Managed REST API | Platform + marketplace |
+| **API compatibility** | Firecrawl-compatible | Custom API | Custom API | Reference API | Custom API |
+| **Browser mode** | Playwright + stealth | Playwright | Yes | Playwright | Playwright + custom |
+| **LLM extraction** | OpenAI + Anthropic | OpenAI + Anthropic | No | OpenAI + Anthropic | Via Actors |
+| **AI Agent integration** | [crawlit-skill](https://github.com/arufian/crawlit-skill) | Manual | Manual | Manual | Manual |
+| **Queue** | BullMQ (Redis) | Async Python | Managed | Managed | Managed |
+| **Cache** | Redis | Optional | Managed | Managed | Managed |
 
-**Key takeaway:** Crawlit is free forever — OSS, MIT-licensed, no API keys, no account required. Firecrawl charges per page beyond the free tier. crawl4ai is also free as a library, with a managed cloud API coming soon (pricing TBD). If you scrape at any real volume, self-hosting Crawlit or crawl4ai saves hundreds to thousands per month compared to Firecrawl.
+**Key takeaway:** Crawlit is the only tool that combines:
+- Free, MIT-licensed, self-hosted
+- Firecrawl-compatible API (easy migration)
+- Built-in AI agent integration
+- No per-page costs or usage limits
+
+Crawl4AI is also free and open-source, but uses a Python library approach. Jina Reader is simple but proprietary with usage limits. Firecrawl and Apify charge per page beyond free tiers. If you scrape at any real volume, self-hosting Crawlit saves hundreds to thousands per month.
 
 ### Annual cost at scale
 
 How much you'd pay per year at different scraping volumes:
 
-| Pages/mo | Crawlit | crawl4ai (self-host) | Firecrawl |
-|---|---|---|---|
-| 100 | $0 | $0 | $0 (free tier) |
-| 1,000 | $0 | $0 | $0 (free tier) |
-| 3,000 | $0 | $0 | **$192/yr** (Hobby: $16/mo) |
-| 10,000 | $0 | $0 | **$996/yr** (Standard: $83/mo) |
-| 50,000 | $0 | $0 | **$996/yr** (Standard) |
-| 100,000 | $0 | $0 | **$996/yr** (Standard) |
-| 200,000 | $0 | $0 | **$3,996/yr** (Growth: $333/mo) |
-| 500,000 | $0 | $0 | **$3,996/yr** (Growth) |
-| 750,000 | $0 | $0 | **$7,188/yr** (Scale: $599/mo) |
-| 1,000,000 | $0 | $0 | **$7,188/yr** (Scale) |
+| Pages/mo | Crawlit | Crawl4AI (self-host) | Jina Reader | Firecrawl | Apify |
+|---|---|---|---|---|---|
+| 100 | $0 | $0 | $0 (free tier) | $0 (free tier) | $0 (free credits) |
+| 1,000 | $0 | $0 | ~$50/yr | $0 (free tier) | ~$468/yr |
+| 3,000 | $0 | $0 | ~$150/yr | **$192/yr** (Hobby) | ~$468/yr |
+| 10,000 | $0 | $0 | ~$500/yr | **$996/yr** (Standard) | ~$2,388/yr |
+| 50,000 | $0 | $0 | ~$2,500/yr | **$3,996/yr** (Growth) | ~$2,388/yr |
+| 100,000 | $0 | $0 | ~$5,000/yr | **$3,996/yr** (Standard) | ~$2,388/yr |
+| 500,000 | $0 | $0 | ~$25,000/yr | **$3,996/yr** (Standard) | ~$2,388/yr |
 
-> All prices assume annual billing (cheapest). Firecrawl free tier capped at 1,000 pages/mo. crawl4ai prices assume self-hosting; cloud pricing not yet public.
+> Crawlit and Crawl4AI are free when self-hosted. Jina Reader pricing estimated at $0.05-0.10 per 1K characters. Firecrawl assumes annual billing. Apify pricing based on Starter plan with additional usage.
 
 ## Features
 

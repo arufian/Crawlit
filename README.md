@@ -15,6 +15,8 @@ Self-hosted web crawler and scraper. Drop-in replacement for Firecrawl — same 
 
 Firecrawl is great but costs money at any meaningful volume. Crawlit gives you the same core functionality (scrape, crawl, map, LLM extraction) running locally via Docker — for free.
 
+**AI Agent Ready:** Use the [crawlit-skill](https://github.com/arufian/crawlit-skill) to let AI coding assistants (Claude Code, Codex, OpenCode, etc.) control Crawlit directly. Your AI agent becomes your web research assistant.
+
 ## Comparison
 
 All three tools self-host at $0. The difference is what you pay when you need scale without managing infrastructure.
@@ -55,6 +57,7 @@ How much you'd pay per year at different scraping volumes:
 
 ## Features
 
+- **AI Agent Integration** — Control via [crawlit-skill](https://github.com/arufian/crawlit-skill) for Claude Code, Codex, OpenCode, and more
 - **`/v1/scrape`** — Single page → clean markdown, HTML, links
 - **`/v1/crawl`** — Async multi-page crawl with BFS, depth control, domain filtering
 - **`/v1/map`** — Fast URL discovery via sitemap.xml + link extraction
@@ -99,6 +102,34 @@ docker compose down -v   # stop + wipe Redis data
 ```
 
 The API runs on `http://localhost:3000`.
+
+---
+
+## AI Agent Integration
+
+Let your AI coding assistant control Crawlit. The [crawlit-skill](https://github.com/arufian/crawlit-skill) provides a consistent interface for AI agents to scrape, crawl, and map websites.
+
+**Works with:**
+- Claude Code
+- OpenAI Codex
+- OpenCode
+- Any MCP-compatible AI tool
+
+**Install:**
+
+```bash
+git clone https://github.com/arufian/crawlit-skill.git
+cd crawlit-skill
+# Follow installation instructions for your AI tool
+```
+
+Once installed, your AI agent can:
+- Scrape single pages: "Get the content of https://example.com"
+- Crawl entire sites: "Scrape all docs under https://docs.example.com"
+- Map URLs: "What pages exist on https://example.com?"
+- Extract structured data: "Get all product prices from this page"
+
+See the [crawlit-skill repo](https://github.com/arufian/crawlit-skill) for full documentation.
 
 ---
 

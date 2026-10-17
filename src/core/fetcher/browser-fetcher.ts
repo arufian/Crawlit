@@ -12,6 +12,12 @@ export interface BrowserAction {
 
 const BLOCKED_RESOURCES = new Set(['image', 'font', 'media', 'stylesheet'])
 
+// Analytics / ad hosts keep the network busy and delay 'networkidle' without adding content
+const BLOCKED_HOSTS = /(^|\.)(google-analytics\.com|googletagmanager\.com|doubleclick\.net|googlesyndication\.com|adservice\.google\.com|facebook\.net|connect\.facebook\.net|hotjar\.com|segment\.(io|com)|mixpanel\.com|clarity\.ms|newrelic\.com|nr-data\.net|sentry\.io|intercom\.io|optimizely\.com|criteo\.(com|net)|taboola\.com|outbrain\.com|scorecardresearch\.com|amazon-adsystem\.com)$/i
+
+/** Max time to wait for network idle after DOMContentLoaded when no explicit waitFor is given. */
+const IDLE_WAIT_MS = 3000
+
 async function runActions(page: Page, actions: BrowserAction[]): Promise<void> {
   for (const action of actions) {
     switch (action.type) {
@@ -33,39 +39,61 @@ async function runActions(page: Page, actions: BrowserAction[]): Promise<void> {
   }
 }
 
-export async function fetchBrowser(
-  url: string,
-  options: {
-    waitFor?: number
-    actions?: BrowserAction[]
-    timeoutMs?: number
-    proxy?: string
-  } = {},
-): Promise<FetchResult> {
-  const { waitFor = 0, actions = [], timeoutMs = 30000, proxy } = options
+function isBlocked(url: string, resourceType: string): boolean {
+  if (BLOCKED_RESOURCES.has(resourceType)) return true
+  try {
+    return BLOCKED_HOSTS.test(new URL(url).hostname)
+  } catch {
+    return false
+  }
+}
+
+/** Run `fn` with a fresh page from the pool; heavy resources and trackers are blocked. */
+export async function withPage<T>(fn: (page: Page) => Promise<T>, proxy?: string): Promise<T> {
   const context = await acquireContext({ ...(proxy !== undefined && { proxy }) })
   const page = await context.newPage()
-
   try {
-    // Block heavy resources for speed
     await page.route('**/*', (route) => {
-      if (BLOCKED_RESOURCES.has(route.request().resourceType())) {
+      const req = route.request()
+      if (isBlocked(req.url(), req.resourceType())) {
         route.abort().catch(() => null)
       } else {
         route.continue().catch(() => null)
       }
     })
+    return await fn(page)
+  } finally {
+    await page.close().catch(() => null)
+    releaseContext(context)
+  }
+}
 
+export async function fetchBrowser(
+  url: string,
+  options: {
+    waitFor?: number
+    waitForSelector?: string
+    actions?: BrowserAction[]
+    timeoutMs?: number
+    proxy?: string
+  } = {},
+): Promise<FetchResult> {
+  const { waitFor = 0, waitForSelector, actions = [], timeoutMs = 30000, proxy } = options
+
+  return withPage(async (page) => {
     const response = await page.goto(url, {
       waitUntil: 'domcontentloaded',
       timeout: timeoutMs,
     })
 
-    // Wait for network idle or explicit delay
+    // Wait for a selector, an explicit delay, or (by default) a short network-idle window
+    if (waitForSelector) {
+      await page.waitForSelector(waitForSelector, { timeout: Math.min(timeoutMs, 15000) }).catch(() => null)
+    }
     if (waitFor > 0) {
       await page.waitForTimeout(waitFor)
-    } else {
-      await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => null)
+    } else if (!waitForSelector) {
+      await page.waitForLoadState('networkidle', { timeout: IDLE_WAIT_MS }).catch(() => null)
     }
 
     await runActions(page, actions)
@@ -75,9 +103,6 @@ export async function fetchBrowser(
     const statusCode = response?.status() ?? 200
     const headersRaw = response?.headers() ?? {}
 
-    return { html, statusCode, headers: headersRaw, url: finalUrl }
-  } finally {
-    await page.close().catch(() => null)
-    releaseContext(context)
-  }
+    return { html, statusCode, headers: headersRaw, url: finalUrl, contentType: headersRaw['content-type'] ?? 'text/html' }
+  }, proxy)
 }

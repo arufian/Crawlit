@@ -1,4 +1,4 @@
-import { Queue, Worker, QueueEvents } from 'bullmq'
+import { Queue, Worker } from 'bullmq'
 import { config } from '../lib/config.js'
 
 export interface CrawlJobData {
@@ -13,7 +13,7 @@ const REDIS_OPTS = { url: config.REDIS_URL, maxRetriesPerRequest: null }
 export const crawlQueue = new Queue<CrawlJobData, void, string>('crawl', {
   connection: REDIS_OPTS,
   defaultJobOptions: {
-    attempts: 3,
+    attempts: 2,
     backoff: { type: 'exponential', delay: 2000 },
     removeOnComplete: { count: 0 },
     removeOnFail: { count: 100 },
@@ -22,13 +22,11 @@ export const crawlQueue = new Queue<CrawlJobData, void, string>('crawl', {
 
 export function makeCrawlWorker(
   processor: (job: { data: CrawlJobData }) => Promise<void>,
-  concurrency = 5,
+  concurrency = config.CRAWL_CONCURRENCY,
 ): Worker<CrawlJobData> {
   return new Worker<CrawlJobData, void, string>('crawl', processor, {
     connection: REDIS_OPTS,
     concurrency,
-    limiter: { max: 2, duration: 1000 },
+    ...(config.CRAWL_RATE_PER_SEC > 0 && { limiter: { max: config.CRAWL_RATE_PER_SEC, duration: 1000 } }),
   })
 }
-
-export const crawlQueueEvents = new QueueEvents('crawl', { connection: REDIS_OPTS })

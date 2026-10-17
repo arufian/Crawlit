@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
 import { fetchHttp } from '../../core/fetcher/http-fetcher.js'
 import { extractLinks } from '../../core/extractor/metadata-extractor.js'
 import normalizeUrl from 'normalize-url'
@@ -12,6 +12,9 @@ const MapBody = z.object({
   url: z.string().url(),
   limit: z.number().int().min(1).max(50000).default(5000),
   includeSubdomains: z.boolean().default(false),
+  // Only return URLs containing this text (case-insensitive), e.g. "blog" or "/docs/"
+  search: z.string().max(200).optional(),
+  ignoreSitemap: z.boolean().default(false),
 })
 
 type MapBodyType = z.infer<typeof MapBody>
@@ -24,39 +27,38 @@ function normalize(url: string): string {
   }
 }
 
+async function sitemapUrls(sitemapUrl: string, timeoutMs: number): Promise<string[]> {
+  try {
+    const { sites } = await new Sitemapper({ timeout: timeoutMs }).fetch(sitemapUrl)
+    return sites
+  } catch {
+    return []
+  }
+}
+
 async function discoverViaSitemap(baseUrl: string, timeoutMs: number): Promise<string[]> {
-  const sitemapper = new Sitemapper({ timeout: timeoutMs })
   const origin = new URL(baseUrl).origin
 
-  // Try common sitemap locations
+  // robots.txt may list sitemaps at non-standard paths; fetch it alongside the common locations
+  const robotsSitemaps = fetchHttp(`${origin}/robots.txt`, 5000)
+    .then(({ html, statusCode }) => statusCode < 400
+      ? [...html.matchAll(/^Sitemap:\s*(\S+)/gim)].map((m) => (m[1] ?? '').trim()).filter(Boolean)
+      : [])
+    .catch(() => [] as string[])
+
   const candidates = [
     `${origin}/sitemap.xml`,
     `${origin}/sitemap_index.xml`,
     `${origin}/sitemap-index.xml`,
   ]
+  const fromCommon = candidates.map((c) => sitemapUrls(c, timeoutMs))
+  const fromRobots = robotsSitemaps.then(async (list) => {
+    const extra = [...new Set(list)].filter((u) => !candidates.includes(u)).slice(0, 10)
+    return (await Promise.all(extra.map((u) => sitemapUrls(u, timeoutMs)))).flat()
+  })
 
-  for (const candidate of candidates) {
-    try {
-      const { sites } = await sitemapper.fetch(candidate)
-      if (sites.length > 0) return sites
-    } catch {
-      // try next
-    }
-  }
-
-  // Check robots.txt for Sitemap: directive
-  try {
-    const { html } = await fetchHttp(`${origin}/robots.txt`, 5000)
-    const match = html.match(/^Sitemap:\s*(.+)$/im)
-    if (match?.[1]) {
-      const { sites } = await sitemapper.fetch(match[1].trim())
-      if (sites.length > 0) return sites
-    }
-  } catch {
-    // ignore
-  }
-
-  return []
+  const all = await Promise.all([...fromCommon, fromRobots])
+  return [...new Set(all.flat())]
 }
 
 export async function mapRoute(app: FastifyInstance): Promise<void> {
@@ -68,24 +70,23 @@ export async function mapRoute(app: FastifyInstance): Promise<void> {
         return reply.status(422).send({ success: false, error: parsed.error.format() })
       }
 
-      const { url, limit, includeSubdomains } = parsed.data
+      const { url, limit, includeSubdomains, search, ignoreSitemap } = parsed.data
       const parsedUrl = new URL(url)
       const seedHostname = parsedUrl.hostname
 
-      // Try sitemap first (fast, comprehensive)
-      let urls = await discoverViaSitemap(url, 10000)
+      // Sitemaps and the seed page's own links in parallel; seed links first so they rank on top
+      const [sitemap, seed] = await Promise.all([
+        ignoreSitemap ? Promise.resolve([] as string[]) : discoverViaSitemap(url, 10000),
+        fetchHttp(url, 15000).then(({ html, url: finalUrl }) => [finalUrl, ...extractLinks(html, finalUrl)]).catch(() => null),
+      ])
 
-      // Fall back to link extraction from seed page
-      if (urls.length === 0) {
-        try {
-          const { html } = await fetchHttp(url, 15000)
-          urls = extractLinks(html, url)
-        } catch {
-          return reply.status(500).send({ success: false, error: 'Failed to fetch page' })
-        }
+      if (seed === null && sitemap.length === 0) {
+        return reply.status(500).send({ success: false, error: 'Failed to fetch page' })
       }
+      const urls = [...(seed ?? []), ...sitemap]
 
       // Normalize + filter by domain
+      const needle = search?.toLowerCase()
       const seen = new Set<string>()
       const filtered: string[] = []
 
@@ -102,6 +103,7 @@ export async function mapRoute(app: FastifyInstance): Promise<void> {
           const normalized = normalize(raw)
           if (seen.has(normalized)) continue
           seen.add(normalized)
+          if (needle && !normalized.toLowerCase().includes(needle)) continue
           filtered.push(normalized)
         } catch {
           // skip invalid

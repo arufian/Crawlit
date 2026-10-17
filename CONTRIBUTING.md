@@ -3,8 +3,8 @@
 ## Setup
 
 ```bash
-git clone https://github.com/your-org/crawlit.git
-cd crawlit
+git clone https://github.com/arufian/Crawlit.git
+cd Crawlit
 npm install
 docker run -d -p 6379:6379 redis:7-alpine
 npm run dev
@@ -14,6 +14,7 @@ npm run dev
 
 ```bash
 npm run typecheck   # must pass
+npm run test:unit   # must pass (no server needed)
 npm run build       # must compile
 ```
 
@@ -22,15 +23,17 @@ npm run build       # must compile
 ```
 src/
   api/
-    routes/         # Fastify route handlers (scrape, crawl, map, metrics)
-    middleware/     # Auth
+    routes/         # Fastify route handlers (scrape, batch, crawl, map, search, health, metrics)
+    schemas.ts      # Shared zod request schemas
   core/
-    fetcher/        # HTTP fetcher, Playwright browser pool
-    extractor/      # Readability, metadata, LLM extraction
-    transformer/    # HTML→markdown, file saving
+    scrape-service.ts # Cache, dedupe, auto mode (HTTP → browser), LLM extract, save
+    fetcher/        # HTTP fetcher (keep-alive, charset), Playwright browser pool
+    extractor/      # Single-parse page processing, worker pool, search result parsers, LLM extraction
+    search/         # Google (HTTP → browser) + DuckDuckGo with fallback, cooldown, cache
+    transformer/    # HTML→markdown (GFM), file saving
   jobs/
     queue.ts        # BullMQ queue + worker factory
-    crawl-state.ts  # Redis-backed crawl state (meta, results, seen set)
+    crawl-state.ts  # Redis hash crawl state with atomic counters, results, seen/done sets
     crawl-worker.ts # BFS crawl processor
   lib/
     config.ts       # Zod-validated env config

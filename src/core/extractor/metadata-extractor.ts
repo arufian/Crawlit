@@ -1,4 +1,4 @@
-import { load } from 'cheerio'
+import { load, type CheerioAPI } from 'cheerio'
 
 export interface PageMetadata {
   title: string
@@ -11,8 +11,13 @@ export interface PageMetadata {
   language: string
 }
 
-export function extractMetadata(html: string, url: string, statusCode: number): PageMetadata {
-  const $ = load(html)
+/** Accepts raw HTML or an already-parsed document, so callers can share one parse. */
+function toCheerio(input: string | CheerioAPI): CheerioAPI {
+  return typeof input === 'string' ? load(input) : input
+}
+
+export function extractMetadata(input: string | CheerioAPI, url: string, statusCode: number): PageMetadata {
+  const $ = toCheerio(input)
 
   return {
     title: $('title').first().text().trim() || $('meta[property="og:title"]').attr('content') || '',
@@ -26,10 +31,10 @@ export function extractMetadata(html: string, url: string, statusCode: number): 
   }
 }
 
-export function extractLinks(html: string, baseUrl: string): string[] {
-  const $ = load(html)
-  const links: string[] = []
-  const base = new URL(baseUrl)
+export function extractLinks(input: string | CheerioAPI, baseUrl: string): string[] {
+  const $ = toCheerio(input)
+  const links = new Set<string>()
+  const base = new URL($('base[href]').attr('href') ?? baseUrl, baseUrl)
 
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href')
@@ -38,12 +43,12 @@ export function extractLinks(html: string, baseUrl: string): string[] {
       const resolved = new URL(href, base)
       if (resolved.protocol === 'http:' || resolved.protocol === 'https:') {
         resolved.hash = ''
-        links.push(resolved.toString())
+        links.add(resolved.toString())
       }
     } catch {
       // invalid URL, skip
     }
   })
 
-  return [...new Set(links)]
+  return [...links]
 }

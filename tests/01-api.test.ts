@@ -94,8 +94,8 @@ describe('POST /v1/scrape', () => {
     expect(data.success).toBe(true)
     expect(data.data.markdown).toBeTruthy()
     expect(data.data.html).toBeTruthy()
+    // example.com currently has no <a> tags, so only the shape is checked here
     expect(Array.isArray(data.data.links)).toBe(true)
-    expect(data.data.links.length).toBeGreaterThan(0)
   })
 
   it('scrapes example.com with rawHtml format', { timeout: shortTimeout }, async () => {
@@ -133,6 +133,37 @@ describe('POST /v1/scrape', () => {
     })
     expect(status).toBe(200)
     expect(data.success).toBe(true)
+  })
+
+  it('follows redirects and reports the final URL', { timeout: shortTimeout }, async () => {
+    const { status, data } = await apiPost<{ data: { metadata: { sourceURL: string; statusCode: number }; markdown: string } }>('/v1/scrape', {
+      url: 'http://github.com/arufian/Crawlit',
+      skipCache: true,
+    })
+    expect(status).toBe(200)
+    expect(data.data.metadata.statusCode).toBe(200)
+    expect(data.data.metadata.sourceURL).toBe('https://github.com/arufian/Crawlit')
+    expect(data.data.markdown.length).toBeGreaterThan(500)
+  })
+
+  it('auto mode uses plain HTTP for server-rendered pages', { timeout: shortTimeout }, async () => {
+    const res = await fetch(`${BASE}/v1/scrape`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: 'https://books.toscrape.com/', skipCache: true }),
+    })
+    expect(res.status).toBe(200)
+    expect(res.headers.get('x-crawlit-source')).toBe('http')
+  })
+
+  it('decodes Shift_JIS pages', { timeout: shortTimeout }, async () => {
+    const { status, data } = await apiPost<{ data: { metadata: { title: string }; markdown: string } }>('/v1/scrape', {
+      url: 'http://abehiroshi.la.coocan.jp/',
+      onlyMainContent: false,
+      skipCache: true,
+    })
+    expect(status).toBe(200)
+    expect(data.data.metadata.title).toContain('阿部寛')
   })
 
   it('returns 422 for invalid URL', async () => {
@@ -333,6 +364,44 @@ describe('POST /v1/crawl', () => {
     expect(status).toBe(422)
     expect(data.success).toBe(false)
   })
+
+  it('returns 422 for an invalid includePaths regex', async () => {
+    const { status } = await apiPost('/v1/crawl', { url: 'https://example.com', includePaths: ['(unclosed'] })
+    expect(status).toBe(422)
+  })
+
+  it('crawls a multi-page site to completion within the limit', { timeout: 180_000 }, async () => {
+    const limit = 15
+    const { data: started } = await apiPost<{ id: string }>('/v1/crawl', {
+      url: 'https://books.toscrape.com/',
+      maxDepth: 2,
+      limit,
+      includePaths: ['^/$', '^/index\\.html$', '^/catalogue/'],
+    })
+    const startedAt = Date.now()
+
+    let final: { status: string; total: number; completed: number; failed: number; data: { url: string; markdown?: string }[] } | null = null
+    while (Date.now() - startedAt < 170_000) {
+      const { data } = await apiGet<NonNullable<typeof final>>(`/v1/crawl/${started.id}?limit=100`)
+      if (data.status === 'completed') {
+        final = data
+        break
+      }
+      await sleep(1000)
+    }
+
+    expect(final).not.toBeNull()
+    expect(final!.total).toBeLessThanOrEqual(limit)
+    expect(final!.completed + final!.failed).toBe(final!.total)
+    expect(final!.completed).toBeGreaterThanOrEqual(10)
+    expect(final!.data.length).toBe(final!.completed)
+    for (const page of final!.data) {
+      const path = new URL(page.url).pathname
+      expect(path === '/' || path === '/index.html' || path.startsWith('/catalogue/')).toBe(true)
+      expect(page.markdown).toBeTruthy()
+    }
+    console.log(`  Crawled ${final!.completed} pages in ${((Date.now() - startedAt) / 1000).toFixed(1)}s`)
+  })
 })
 
 // ─── MAP ──────────────────────────────────────────────
@@ -375,37 +444,126 @@ describe('POST /v1/map', () => {
     expect(status).toBe(422)
     expect(data.success).toBe(false)
   })
+
+  it('filters URLs with search', { timeout: 60_000 }, async () => {
+    const { status, data } = await apiPost<{ success: boolean; links: string[] }>('/v1/map', {
+      url: 'https://books.toscrape.com/',
+      search: 'travel',
+    })
+    expect(status).toBe(200)
+    expect(data.links.length).toBeGreaterThan(0)
+    for (const link of data.links) expect(link.toLowerCase()).toContain('travel')
+  })
+})
+
+// ─── BATCH SCRAPE ─────────────────────────────────────
+
+describe('POST /v1/batch/scrape', () => {
+  it('scrapes several URLs in one request and reports per-URL failures', { timeout: 90_000 }, async () => {
+    const { status, data } = await apiPost<{
+      success: boolean
+      total: number
+      completed: number
+      failed: number
+      data: { url: string; success: boolean; markdown?: string; error?: string }[]
+    }>('/v1/batch/scrape', {
+      urls: [
+        'https://example.com',
+        'https://books.toscrape.com/',
+        'https://this-domain-definitely-does-not-exist-00000.com',
+      ],
+      formats: ['markdown'],
+    })
+    expect(status).toBe(200)
+    expect(data.success).toBe(true)
+    expect(data.total).toBe(3)
+    expect(data.completed).toBe(2)
+    expect(data.failed).toBe(1)
+    expect(data.data.map((d) => d.url)).toEqual([
+      'https://example.com',
+      'https://books.toscrape.com/',
+      'https://this-domain-definitely-does-not-exist-00000.com',
+    ])
+    expect(data.data[0]!.markdown).toContain('documentation examples')
+    expect(data.data[2]!.success).toBe(false)
+    expect(data.data[2]!.error).toBeTruthy()
+  })
+
+  it('returns 422 for an empty URL list', async () => {
+    const { status } = await apiPost('/v1/batch/scrape', { urls: [] })
+    expect(status).toBe(422)
+  })
 })
 
 // ─── SEARCH ──────────────────────────────────────────
 
 describe('POST /v1/search', () => {
-  it('searches DuckDuckGo for results', async () => {
+  it('searches Google by default and returns real target URLs', { timeout: 60_000 }, async () => {
     const { status, data } = await apiPost<{
       success: boolean
-      data: { query: string; results: { title: string; url: string; snippet: string }[]; total: number; blocked?: boolean }
+      data: {
+        query: string
+        engine: string
+        results: { title: string; url: string; snippet: string; position: number }[]
+        total: number
+        fallbackFrom?: { engine: string; reason: string }[]
+        blocked?: boolean
+      }
     }>('/v1/search', {
-      query: 'crawlit',
+      query: 'fastify rate limit plugin',
       limit: 5,
+      skipCache: true,
     })
     expect(status).toBe(200)
     expect(data.success).toBe(true)
-    expect(data.data.query).toBe('crawlit')
-    expect(Array.isArray(data.data.results)).toBe(true)
+    expect(data.data.query).toBe('fastify rate limit plugin')
     expect(data.data.results.length).toBeLessThanOrEqual(5)
     expect(data.data.total).toBe(data.data.results.length)
+    if (data.data.fallbackFrom) console.log(`  Fallbacks: ${JSON.stringify(data.data.fallbackFrom)}`)
 
-    if (data.data.results.length > 0) {
-      const first = data.data.results[0]
-      expect(first.title).toBeTruthy()
-      expect(first.url).toBeTruthy()
-      expect(() => new URL(first.url)).not.toThrow()
-      expect(typeof first.snippet).toBe('string')
-      console.log(`  Found ${data.data.total} results`)
-      console.log(`  First result: "${first.title}"`)
-    } else {
-      console.log(`  DuckDuckGo returned 0 results (likely rate-limited from earlier requests)`)
+    // Google throttles IPs that search heavily; then the fallback engine must still deliver
+    const googleBlocked = data.data.fallbackFrom?.some((f) => f.engine === 'google' && /captcha/i.test(f.reason))
+    if (googleBlocked) console.log('  Google is blocking this IP right now — verifying the fallback instead')
+    else expect(data.data.engine).toBe('google')
+    expect(data.data.results.length).toBeGreaterThanOrEqual(3)
+    for (const [i, r] of data.data.results.entries()) {
+      expect(r.title).toBeTruthy()
+      expect(r.position).toBe(i + 1)
+      // Google redirect wrappers must be unwrapped
+      expect(new URL(r.url).hostname).not.toMatch(/(^|\.)google\./)
     }
+    expect(data.data.results.some((r) => /fastify/i.test(r.url + r.title))).toBe(true)
+    console.log(`  ${data.data.engine}: ${data.data.results.map((r) => r.url).join(', ')}`)
+  })
+
+  it('serves repeated searches from cache', { timeout: 60_000 }, async () => {
+    const body = { query: 'crawlit self-hosted scraper', limit: 3 }
+    await apiPost('/v1/search', body)
+    const start = Date.now()
+    const { data } = await apiPost<{ data: { cached?: boolean } }>('/v1/search', body)
+    expect(data.data.cached).toBe(true)
+    expect(Date.now() - start).toBeLessThan(500)
+  })
+
+  it('attaches page content with scrapeOptions', { timeout: 90_000 }, async () => {
+    const { status, data } = await apiPost<{
+      success: boolean
+      data: { results: { url: string; markdown?: string; metadata?: { title: string }; scrapeError?: string }[] }
+    }>('/v1/search', {
+      query: 'example domain iana',
+      limit: 2,
+      scrapeOptions: { formats: ['markdown'] },
+    })
+    expect(status).toBe(200)
+    expect(data.data.results.length).toBeGreaterThan(0)
+    const scraped = data.data.results.filter((r) => r.markdown)
+    expect(scraped.length).toBeGreaterThan(0)
+    expect(scraped[0]!.metadata).toBeDefined()
+  })
+
+  it('returns 422 for an unknown engine', async () => {
+    const { status } = await apiPost('/v1/search', { query: 'x', engine: 'altavista' })
+    expect(status).toBe(422)
   })
 
   it('returns 422 for empty query', async () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 
 const BASE = process.env.CRAWLIT_BASE_URL ?? 'http://localhost:3000'
 const CONCURRENCY = 1000
-const RATE_LIMIT = 60 // server's 60 req/min
+const RATE_LIMIT = Number(process.env.RATE_LIMIT_MAX ?? 60) // must match the server's RATE_LIMIT_MAX
 
 async function healthCheck(): Promise<boolean> {
   try {

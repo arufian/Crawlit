@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# crawlit — manage a local Crawlit install (installed by install.sh)
+set -euo pipefail
+
+# Resolve the install dir through the symlink in ~/.local/bin (no readlink -f on older macOS)
+src="${BASH_SOURCE[0]}"
+while [ -L "$src" ]; do
+  link="$(readlink "$src")"
+  case "$link" in /*) src="$link" ;; *) src="$(cd "$(dirname "$src")" && pwd)/$link" ;; esac
+done
+DIR="$(cd "$(dirname "$src")/.." && pwd)"
+cd "$DIR"
+
+PORT="$(grep '^CRAWLIT_PORT=' .env 2>/dev/null | tail -1 | cut -d= -f2 || true)"
+PORT="${PORT:-3000}"
+BASE="http://localhost:$PORT"
+
+if docker compose version >/dev/null 2>&1; then COMPOSE="docker compose"; else COMPOSE="docker-compose"; fi
+
+need_docker() {
+  command -v docker >/dev/null 2>&1 || { echo "Docker is not installed. Install Docker first: https://docs.docker.com/get-started/get-docker/" >&2; exit 1; }
+  docker info >/dev/null 2>&1 || { echo "Docker is not running. Start Docker Desktop (or your Docker service) first." >&2; exit 1; }
+}
+
+wait_healthy() {
+  printf 'waiting for %s' "$BASE"
+  for _ in $(seq 1 120); do
+    if curl -sf -m 3 "$BASE/health" >/dev/null 2>&1; then printf '\nCrawlit is up at %s\n' "$BASE"; return 0; fi
+    printf '.'; sleep 2
+  done
+  printf '\nNot healthy yet. Check: crawlit logs\n' >&2
+  return 1
+}
+
+cmd="${1:-help}"
+case "$cmd" in
+  start)
+    need_docker
+    $COMPOSE up -d
+    wait_healthy
+    ;;
+  stop)
+    need_docker
+    $COMPOSE stop
+    ;;
+  restart)
+    need_docker
+    $COMPOSE restart app
+    wait_healthy
+    ;;
+  status)
+    if curl -sf -m 3 "$BASE/health" 2>/dev/null; then
+      printf '\nRunning at %s (installed in %s)\n' "$BASE" "$DIR"
+    else
+      echo "Not running at $BASE. Start it with: crawlit start"
+      exit 1
+    fi
+    ;;
+  logs)
+    need_docker
+    $COMPOSE logs -f --tail=100 app
+    ;;
+  update)
+    need_docker
+    # Re-run the installer: it updates the code, keeps .env, rebuilds and restarts
+    curl -fsSL https://raw.githubusercontent.com/arufian/Crawlit/main/install.sh | CRAWLIT_DIR="$DIR" bash
+    ;;
+  uninstall)
+    printf 'This stops Crawlit, deletes its cache, and removes %s. Continue? [y/N] ' "$DIR"
+    read -r answer </dev/tty
+    case "$answer" in y|Y|yes|YES) ;; *) echo "Cancelled."; exit 0 ;; esac
+    if docker info >/dev/null 2>&1; then $COMPOSE down -v --rmi local || true; fi
+    for link in "$HOME/.local/bin/crawlit" "$HOME/bin/crawlit" "/usr/local/bin/crawlit"; do
+      [ -L "$link" ] && [ "$(readlink "$link")" = "$DIR/bin/crawlit" ] && rm -f "$link"
+    done
+    rm -rf "$DIR"
+    echo "Crawlit removed."
+    ;;
+  open)
+    url="https://labs.arufian.dev/crawlit/"
+    if command -v open >/dev/null 2>&1; then open "$url"; elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$url"; else echo "$url"; fi
+    ;;
+  help|-h|--help)
+    cat <<EOF
+crawlit — manage your local Crawlit (installed in $DIR)
+
+  crawlit start       start Crawlit and wait until it's ready
+  crawlit stop        stop it (cache is kept)
+  crawlit restart     restart the API
+  crawlit status      health, version and search engine status
+  crawlit logs        follow the server logs
+  crawlit update      update to the latest version (keeps your .env)
+  crawlit uninstall   stop and remove everything
+  crawlit open        open the docs website
+
+API: $BASE    Settings: $DIR/.env
+EOF
+    ;;
+  *)
+    echo "Unknown command: $cmd (try: crawlit help)" >&2
+    exit 1
+    ;;
+esac

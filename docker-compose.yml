@@ -2,7 +2,7 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - "${CRAWLIT_BIND:-0.0.0.0}:${CRAWLIT_PORT:-3000}:3000"
     environment:
       - REDIS_URL=redis://redis:6379
       - LOG_LEVEL=info

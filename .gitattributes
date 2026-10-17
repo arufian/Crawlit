@@ -1,0 +1,6 @@
+# Shell scripts must keep LF endings even when cloned on Windows
+*.sh text eol=lf
+bin/crawlit text eol=lf
+# Windows scripts use CRLF
+*.ps1 text eol=crlf
+*.cmd text eol=crlf

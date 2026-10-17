@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.svg" width="110" alt="Crawlit logo"/>
+  <img src="assets/logo.png" width="128" alt="Crawlit logo: a robot spider with glowing red eyes"/>
 </p>
 
 <h1 align="center">Crawlit</h1>
